@@ -1,6 +1,6 @@
 package com.techio.bugpilot.filter;
 
-import com.techio.bugpilot.user.service.CustomUserDetailsService;
+import com.techio.bugpilot.user.service.impl.CustomUserDetailsService;
 import com.techio.bugpilot.utility.JwtUtil;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;

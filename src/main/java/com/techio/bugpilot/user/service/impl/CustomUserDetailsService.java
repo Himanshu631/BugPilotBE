@@ -1,4 +1,4 @@
-package com.techio.bugpilot.user.service;
+package com.techio.bugpilot.user.service.impl;
 
 import com.techio.bugpilot.rbac.entity.Permission;
 import com.techio.bugpilot.rbac.entity.Role;
@@ -6,7 +6,6 @@ import com.techio.bugpilot.rbac.repository.PermissionRepository;
 import com.techio.bugpilot.rbac.repository.RoleRepository;
 import com.techio.bugpilot.user.entity.User;
 import com.techio.bugpilot.user.repository.UserDetailsRepository;
-import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;

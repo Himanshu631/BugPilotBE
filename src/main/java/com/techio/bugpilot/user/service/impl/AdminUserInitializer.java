@@ -1,4 +1,4 @@
-package com.techio.bugpilot.user.service;
+package com.techio.bugpilot.user.service.impl;
 
 import com.techio.bugpilot.rbac.entity.Permission;
 import com.techio.bugpilot.rbac.entity.Role;
