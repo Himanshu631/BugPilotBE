@@ -1,7 +1,6 @@
 package com.techio.bugpilot.user.service;
 
 import com.techio.bugpilot.config.AppConfig;
-import com.techio.bugpilot.config.SecurityConfig;
 import com.techio.bugpilot.user.entity.User;
 import com.techio.bugpilot.user.payload.UserRequest;
 import com.techio.bugpilot.user.repository.UserDetailsRepository;
@@ -32,7 +31,6 @@ public class UserService {
         user.setName(userRequest.getName());
         user.setUsername(userRequest.getUsername());
         user.setPassword(appConfig.passwordEncoder().encode(userRequest.getPassword()));
-        user.setRole(userRequest.getRole());
 
         userRepository.save(user);
 
