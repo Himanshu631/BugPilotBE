@@ -1,16 +1,11 @@
 package com.techio.bugpilot.user.controller;
 
-import com.techio.bugpilot.user.entity.Employee;
-import com.techio.bugpilot.user.payload.EmployeeApiResponse;
 import com.techio.bugpilot.user.payload.UserRequest;
 import com.techio.bugpilot.user.repository.EmployeeRepository;
-import com.techio.bugpilot.user.service.CustomUserDetailsService;
 import com.techio.bugpilot.user.service.UserService;
-import jakarta.servlet.http.HttpServletRequest;
+import com.techio.bugpilot.utility.GenericResponse;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -53,7 +48,11 @@ public class UserController {
 
     @PostMapping
     public ResponseEntity<?> createUser(@RequestBody UserRequest request) {
-        return userDetailsService.createUser(request);
-
+        GenericResponse<?> genericResponse = userDetailsService.createUser(request);
+        if (genericResponse.isSuccess()) {
+            return new ResponseEntity<>(genericResponse, HttpStatus.OK);
+        } else {
+            return new ResponseEntity<>(genericResponse, HttpStatus.UNAUTHORIZED);
+        }
     }
 }
