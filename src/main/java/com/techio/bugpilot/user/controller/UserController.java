@@ -21,6 +21,7 @@ public class UserController {
 
     @PostMapping
     public ResponseEntity<?> createUser(@RequestBody UserRequest request) {
+        request.setIsFromClientAdmin(false);
         GenericResponse<?> genericResponse = userDetailsService.createUser(request);
         if (genericResponse.isSuccess()) {
             return new ResponseEntity<>(genericResponse, HttpStatus.OK);

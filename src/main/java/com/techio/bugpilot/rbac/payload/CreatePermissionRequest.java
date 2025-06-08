@@ -5,6 +5,5 @@ import lombok.Data;
 @Data
 public class CreatePermissionRequest {
     private String name;
-    private String clientId;
     private String description;
 }

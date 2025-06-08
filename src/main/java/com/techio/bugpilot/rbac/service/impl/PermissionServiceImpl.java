@@ -4,6 +4,7 @@ import com.techio.bugpilot.rbac.entity.Permission;
 import com.techio.bugpilot.rbac.payload.CreatePermissionRequest;
 import com.techio.bugpilot.rbac.repository.PermissionRepository;
 import com.techio.bugpilot.rbac.service.PermissionService;
+import com.techio.bugpilot.utility.AuthContextUtil;
 import com.techio.bugpilot.utility.GenericResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -15,6 +16,7 @@ import java.util.List;
 public class PermissionServiceImpl implements PermissionService {
 
     private final PermissionRepository permissionRepository;
+    private final AuthContextUtil authContextUtil;
 
     @Override
     public GenericResponse<Permission> createPermission(CreatePermissionRequest request) {
@@ -24,7 +26,7 @@ public class PermissionServiceImpl implements PermissionService {
 
         Permission permission = new Permission();
         permission.setName(request.getName());
-        permission.setClientId(request.getClientId());
+        permission.setClientId(authContextUtil.getClientIdOrThrow());
         permission.setDescription(request.getDescription());
 
         Permission saved = permissionRepository.save(permission);

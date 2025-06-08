@@ -14,6 +14,7 @@ public class UserRequest {
     private String password;
     private String clientId;
     private String role;
+    private Boolean isFromClientAdmin;
 }
 
 

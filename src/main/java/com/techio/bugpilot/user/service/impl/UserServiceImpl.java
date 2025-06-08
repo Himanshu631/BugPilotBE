@@ -1,6 +1,8 @@
 package com.techio.bugpilot.user.service.impl;
 
 import com.techio.bugpilot.config.AppConfig;
+import com.techio.bugpilot.rbac.entity.Role;
+import com.techio.bugpilot.rbac.repository.RoleRepository;
 import com.techio.bugpilot.user.entity.User;
 import com.techio.bugpilot.user.payload.UserPrincipal;
 import com.techio.bugpilot.user.payload.UserRequest;
@@ -27,6 +29,9 @@ public class UserServiceImpl implements UserService {
     @Autowired
     private AuthContextUtil authContextUtil;
 
+    @Autowired
+    private RoleRepository roleRepository;
+
     public GenericResponse<User> createUser(UserRequest userRequest) {
         if (userRequest.getUsername() == null ) {
             return GeneralUtility.failure("Username cannot be null");
@@ -39,7 +44,16 @@ public class UserServiceImpl implements UserService {
         user.setName(userRequest.getName());
         user.setUsername(userRequest.getUsername());
         user.setPassword(appConfig.passwordEncoder().encode(userRequest.getPassword()));
-        user.setClientId(userRequest.getClientId());
+        if (userRequest.getClientId() == null || userRequest.getClientId().isEmpty()) {
+            user.setClientId(authContextUtil.getClientIdOrThrow());
+        } else {
+            user.setClientId(userRequest.getClientId());
+        }
+
+        if (userRequest.getIsFromClientAdmin() != null && userRequest.getIsFromClientAdmin().equals(Boolean.TRUE)) {
+            roleRepository.findByName("CLIENT_ADMIN").ifPresent(clientAdmin -> user.setRoleIds(List.of(clientAdmin.getId())));
+        }
+
         userRepository.save(user);
 
         return GeneralUtility.success("User Created Successfully", user);

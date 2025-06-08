@@ -5,9 +5,15 @@ import com.techio.bugpilot.rbac.payload.CreateRoleRequest;
 import com.techio.bugpilot.rbac.repository.PermissionRepository;
 import com.techio.bugpilot.rbac.repository.RoleRepository;
 import com.techio.bugpilot.rbac.service.RoleService;
+import com.techio.bugpilot.user.entity.User;
+import com.techio.bugpilot.user.repository.UserDetailsRepository;
+import com.techio.bugpilot.utility.AuthContextUtil;
+import com.techio.bugpilot.utility.GeneralUtility;
 import com.techio.bugpilot.utility.GenericResponse;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
+import org.springframework.web.server.ResponseStatusException;
 
 import java.util.*;
 
@@ -17,6 +23,8 @@ public class RoleServiceImpl implements RoleService {
 
     private final RoleRepository roleRepository;
     private final PermissionRepository permissionRepository;
+    private final AuthContextUtil authContextUtil;
+    private final UserDetailsRepository userRepository;
 
     @Override
     public GenericResponse<Role> createRole(CreateRoleRequest request) {
@@ -26,7 +34,7 @@ public class RoleServiceImpl implements RoleService {
 
         Role role = new Role();
         role.setName(request.getName());
-        role.setClientId(request.getClientId());
+        role.setClientId(authContextUtil.getClientIdOrThrow());
         role.setDescription(request.getDescription());
         role.setPermissionIds(request.getPermissionIds());
 
@@ -53,6 +61,37 @@ public class RoleServiceImpl implements RoleService {
     public GenericResponse<List<Role>> getAllRoles() {
         List<Role> roles = roleRepository.findAll();
         return new GenericResponse<>(true, "Fetched roles", roles);
+    }
+
+    public GenericResponse<List<Role>> getUserRoles(String userId) {
+        String clientId = authContextUtil.getClientIdOrThrow();
+
+        User user = userRepository.findByIdAndClientId(userId, clientId)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "User not found"));
+
+        List<Role> roles = roleRepository.findByIdIn(user.getRoleIds());
+        return GeneralUtility.success("Roles fetched successfully", roles);
+    }
+
+    public GenericResponse<String> assignRoleToUser(String userId, String roleId) {
+        String clientId = authContextUtil.getClientIdOrThrow();
+
+        Role role = roleRepository.findByIdAndClientId(roleId, clientId)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.BAD_REQUEST, "Role not found or not allowed"));
+
+        User user = userRepository.findByIdAndClientId(userId, clientId)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "User not found"));
+
+        if (user.getRoleIds() == null) {
+            user.setRoleIds(new ArrayList<>());
+        }
+
+        if (!user.getRoleIds().contains(roleId)) {
+            user.getRoleIds().add(roleId);
+            userRepository.save(user);
+        }
+
+        return GeneralUtility.success("Role assigned successfully", null);
     }
 
 }
