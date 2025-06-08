@@ -17,6 +17,7 @@ public class Role {
     @Id
     private String id = UUID.randomUUID().toString();
     private String name;
+    private String clientId;
     private String description;
     private List<String> permissionIds;
 }

@@ -26,6 +26,7 @@ public class RoleServiceImpl implements RoleService {
 
         Role role = new Role();
         role.setName(request.getName());
+        role.setClientId(request.getClientId());
         role.setDescription(request.getDescription());
         role.setPermissionIds(request.getPermissionIds());
 
@@ -44,7 +45,6 @@ public class RoleServiceImpl implements RoleService {
         Set<String> existingPermissions = new HashSet<>(role.getPermissionIds());
         existingPermissions.addAll(permissionIds);
         role.setPermissionIds(new ArrayList<>(existingPermissions));
-
         Role updatedRole = roleRepository.save(role);
         return new GenericResponse<>(true, "Permissions added to role", updatedRole);
     }

@@ -26,7 +26,7 @@ public class AuthController {
 
     @PostMapping
     public ResponseEntity<GenericResponse<?>> generateToken(@RequestBody AuthRequest authRequest) {
-        GenericResponse genericResponse = authService.authenticate(authRequest);
+        GenericResponse<?> genericResponse = authService.authenticate(authRequest);
         if (genericResponse.isSuccess()) {
             return new ResponseEntity<>(genericResponse, HttpStatus.OK);
         } else {

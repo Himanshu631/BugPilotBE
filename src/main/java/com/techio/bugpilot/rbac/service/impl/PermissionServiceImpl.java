@@ -24,6 +24,7 @@ public class PermissionServiceImpl implements PermissionService {
 
         Permission permission = new Permission();
         permission.setName(request.getName());
+        permission.setClientId(request.getClientId());
         permission.setDescription(request.getDescription());
 
         Permission saved = permissionRepository.save(permission);

@@ -26,6 +26,7 @@ public class User implements UserDetails {
     private String name;
     private String username;
     private String password;
+    private String clientId;
     private List<String> roleIds;
     private List<GrantedAuthority> authorities;
     @Override

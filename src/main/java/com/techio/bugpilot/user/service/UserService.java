@@ -10,4 +10,5 @@ public interface UserService {
     GenericResponse<User> createUser(UserRequest userRequest);
     GenericResponse<User> assignRoles(String userId, List<String> roleIds);
     GenericResponse<?> getAssignedRoles(String userId);
+    GenericResponse<?> getAllUsersByClientId();
 }

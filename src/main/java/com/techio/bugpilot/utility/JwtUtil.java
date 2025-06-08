@@ -25,7 +25,6 @@ public class JwtUtil {
                 .claim("roles", roles)
                 .claim("permissions", permissions)
                 .setIssuer("Techio BugPilot")
-                .setSubject("User Login")
                 .setIssuedAt(new Date())
                 .setExpiration(new Date(System.currentTimeMillis() + EXPIRATION_TIME))
                 .signWith(key, SignatureAlgorithm.HS256)
