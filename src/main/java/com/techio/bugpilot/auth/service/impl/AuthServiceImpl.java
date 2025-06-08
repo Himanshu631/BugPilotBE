@@ -59,13 +59,16 @@ public class AuthServiceImpl implements AuthService {
 
         List<Permission> permissions = permissionRepository.findAllById(permissionIds);
 
+        List<String> rolesRes = roles.stream().map(Role::getName).toList();
+        List<String> permissionResp = permissions.stream().map(Permission::getName).toList();
+
         AuthResponse authResponse = new AuthResponse();
         authResponse.setName(user.getName());
         authResponse.setUserName(user.getUsername());
-        authResponse.setAccessToken(jwtUtil.generateToken(authRequest.getUserName()));
+        authResponse.setAccessToken(jwtUtil.generateToken(authRequest.getUserName(), rolesRes, permissionResp));
         authResponse.setMessage("Login successful");
-        authResponse.setRoles(roles);
-        authResponse.setAuthorities(permissions);
+        authResponse.setRoles(rolesRes);
+        authResponse.setAuthorities(permissionResp);
 
         return GeneralUtility.success("Login successful", authResponse);
     }

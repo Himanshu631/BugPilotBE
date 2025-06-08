@@ -54,5 +54,10 @@ public class AdminController {
     public ResponseEntity<GenericResponse<User>> assignRoles(@PathVariable String userId, @RequestBody List<String> roleIds) {
         return ResponseEntity.ok(userService.assignRoles(userId, roleIds));
     }
+
+    @GetMapping("/users/{userId}/roles")
+    public ResponseEntity<GenericResponse<?>> getAssignedRoles(@PathVariable String userId) {
+        return ResponseEntity.ok(userService.getAssignedRoles(userId));
+    }
 }
 
