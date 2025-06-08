@@ -55,6 +55,16 @@ public class AdminUserInitializer {
                         return roleRepository.save(role);
                     });
 
+            Role clientAdmin = roleRepository.findByName("CLIENT_ADMIN")
+                    .orElseGet(() -> {
+                        Role role = new Role();
+                        role.setName("CLIENT_ADMIN");
+                        role.setPermissionIds(
+                                savedPermissions.stream().map(Permission::getId).toList()
+                        );
+                        return roleRepository.save(role);
+                    });
+
             if (userRepository.findByUsername("admin").isEmpty()) {
                 User admin = new User();
                 admin.setName("Admin User");

@@ -36,7 +36,7 @@ public class ClientService {
 
         UserRequest userRequest = request.getUserRequest();
         userRequest.setClientId(client.getId());
-
+        userRequest.setIsFromClientAdmin(true);
         GenericResponse<User> serviceUser = userService.createUser(userRequest);
         if (!serviceUser.isSuccess()) {
             return GeneralUtility.failure("Admin user could not be created");
