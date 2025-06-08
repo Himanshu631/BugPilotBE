@@ -19,6 +19,7 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
@@ -36,15 +37,13 @@ public class AuthServiceImpl implements AuthService {
 
     @Override
     public GenericResponse<?> authenticate(AuthRequest authRequest) {
-        Optional<User> userOptional = userDetailsRepository.findByUsername(authRequest.getUserName());
-
+        Optional<User> userOptional = userDetailsRepository.findByUsername(authRequest.getUsername());
         if (userOptional.isEmpty()) {
             return GeneralUtility.failure("Invalid username or password");
         }
 
         try {
-            authenticationManager.authenticate(
-                    new UsernamePasswordAuthenticationToken(authRequest.getUserName(), authRequest.getPassword())
+            authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(authRequest.getUsername(), authRequest.getPassword())
             );
         } catch (BadCredentialsException ex) {
             return GeneralUtility.failure("Invalid username or password");
@@ -52,20 +51,25 @@ public class AuthServiceImpl implements AuthService {
 
         User user = userOptional.get();
 
-        List<Role> roles = roleRepository.findAllById(user.getRoleIds());
-        Set<String> permissionIds = roles.stream()
-                .flatMap(role -> role.getPermissionIds().stream())
-                .collect(Collectors.toSet());
+        List<String> rolesRes = new ArrayList<>();
+        List<String> permissionResp = new ArrayList<>();
+        if (user.getRoleIds() != null && !user.getRoleIds().isEmpty()) {
+            List<Role> roles = roleRepository.findAllById(user.getRoleIds());
+            Set<String> permissionIds = roles.stream()
+                    .flatMap(role -> role.getPermissionIds().stream())
+                    .collect(Collectors.toSet());
 
-        List<Permission> permissions = permissionRepository.findAllById(permissionIds);
+            List<Permission> permissions = permissionRepository.findAllById(permissionIds);
 
-        List<String> rolesRes = roles.stream().map(Role::getName).toList();
-        List<String> permissionResp = permissions.stream().map(Permission::getName).toList();
+            rolesRes = roles.stream().map(Role::getName).toList();
+            permissionResp = permissions.stream().map(Permission::getName).toList();
+        }
+
 
         AuthResponse authResponse = new AuthResponse();
         authResponse.setName(user.getName());
         authResponse.setUserName(user.getUsername());
-        authResponse.setAccessToken(jwtUtil.generateToken(authRequest.getUserName(), rolesRes, permissionResp));
+        authResponse.setAccessToken(jwtUtil.generateToken(authRequest.getUsername(), rolesRes, permissionResp));
         authResponse.setMessage("Login successful");
         authResponse.setRoles(rolesRes);
         authResponse.setAuthorities(permissionResp);

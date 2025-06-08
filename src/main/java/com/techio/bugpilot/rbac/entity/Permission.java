@@ -16,6 +16,7 @@ public class Permission {
     @Id
     private String id = UUID.randomUUID().toString();
     private String name;
+    private String clientId;
     private String description;
 }
 
