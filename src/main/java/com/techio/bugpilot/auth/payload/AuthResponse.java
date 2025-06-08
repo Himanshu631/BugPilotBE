@@ -17,8 +17,8 @@ public class AuthResponse {
     private String message;
     private String accessToken;
     private String refreshToken;
-    private List<Role> roles;
-    private List<Permission> authorities;
+    private List<String> roles;
+    private List<String> authorities;
     private String tokenType = "Bearer";
 }
 

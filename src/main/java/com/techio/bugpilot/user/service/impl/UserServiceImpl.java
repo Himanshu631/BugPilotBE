@@ -11,6 +11,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Optional;
 
 @Service
 public class UserServiceImpl implements UserService {
@@ -42,5 +43,17 @@ public class UserServiceImpl implements UserService {
     @Override
     public GenericResponse<User> assignRoles(String userId, List<String> roleIds) {
         return null;
+    }
+
+    @Override
+    public GenericResponse<?> getAssignedRoles(String userId) {
+        Optional<User> userOptional = userRepository.findById(userId);
+        if (userOptional.isEmpty()) {
+            return GeneralUtility.failure("Invalid User Id");
+        }
+
+        User user = userOptional.get();
+
+        return GeneralUtility.success("User Details Fetched Successfully", user);
     }
 }
