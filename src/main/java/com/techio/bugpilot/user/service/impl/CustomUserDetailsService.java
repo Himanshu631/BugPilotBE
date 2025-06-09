@@ -5,6 +5,7 @@ import com.techio.bugpilot.rbac.entity.Role;
 import com.techio.bugpilot.rbac.repository.PermissionRepository;
 import com.techio.bugpilot.rbac.repository.RoleRepository;
 import com.techio.bugpilot.user.entity.User;
+import com.techio.bugpilot.user.payload.UserPrincipal;
 import com.techio.bugpilot.user.repository.UserDetailsRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.GrantedAuthority;
@@ -49,11 +50,14 @@ public class CustomUserDetailsService implements UserDetailsService {
                     .collect(Collectors.toList());
         }
 
-        return new org.springframework.security.core.userdetails.User(
+        return new UserPrincipal(
+                user.getId(),              // userId
                 user.getUsername(),
                 user.getPassword(),
+                user.getClientId(),
                 authorities
         );
     }
+
 
 }

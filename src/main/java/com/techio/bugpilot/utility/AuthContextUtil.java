@@ -27,5 +27,23 @@ public class AuthContextUtil {
 
         throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Unexpected authentication principal");
     }
+
+    public String getUserId() {
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+
+        if (auth == null || auth.getPrincipal() == null) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Invalid authentication context");
+        }
+
+        if (auth.getPrincipal() instanceof UserPrincipal userPrincipal) {
+            String userId = userPrincipal.getUserId();
+            if (userId == null || userId.isBlank()) {
+                throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "User ID is missing in token");
+            }
+            return userId;
+        }
+
+        throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Unexpected authentication principal");
+    }
 }
 

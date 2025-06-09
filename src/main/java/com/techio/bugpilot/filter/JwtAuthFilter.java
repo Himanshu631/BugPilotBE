@@ -1,5 +1,6 @@
 package com.techio.bugpilot.filter;
 
+import com.techio.bugpilot.user.entity.User;
 import com.techio.bugpilot.user.service.impl.CustomUserDetailsService;
 import com.techio.bugpilot.utility.JwtUtil;
 import jakarta.servlet.FilterChain;
@@ -39,9 +40,12 @@ public class JwtAuthFilter extends OncePerRequestFilter {
             UserDetails userDetails = customUserDetailsService.loadUserByUsername(username);
 
             if (jwtUtil.validateToken(username, userDetails, token)) {
-               UsernamePasswordAuthenticationToken authToken = new UsernamePasswordAuthenticationToken(userDetails, null, userDetails.getAuthorities());
-               authToken.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
-               SecurityContextHolder.getContext().setAuthentication(authToken);
+                UsernamePasswordAuthenticationToken authToken =
+                        new UsernamePasswordAuthenticationToken(userDetails, null, userDetails.getAuthorities());
+
+                authToken.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
+
+                SecurityContextHolder.getContext().setAuthentication(authToken);
             }
         }
 

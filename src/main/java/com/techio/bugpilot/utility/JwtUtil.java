@@ -18,11 +18,13 @@ public class JwtUtil {
     private final String SECRET = "enoxkxwnhbltdpfjuacraaoggjdvmbvehisfofegnunfyhpqbilffjxdateqijef";
     private final SecretKey key = Keys.hmacShaKeyFor(SECRET.getBytes());
 
-    public String generateToken(String username, List<String> roles, List<String> permissions) {
+    public String generateToken(String username, List<String> roles, List<String> permissions, String userId, String clientId) {
 
         return Jwts.builder()
                 .setSubject(username)
                 .claim("roles", roles)
+                .claim("clientId", clientId)
+                .claim("userId", userId)
                 .claim("permissions", permissions)
                 .setIssuer("Techio BugPilot")
                 .setIssuedAt(new Date())
