@@ -1,8 +1,11 @@
 package com.techio.bugpilot.filter;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.techio.bugpilot.user.entity.User;
 import com.techio.bugpilot.user.service.impl.CustomUserDetailsService;
+import com.techio.bugpilot.utility.GenericResponse;
 import com.techio.bugpilot.utility.JwtUtil;
+import io.jsonwebtoken.ExpiredJwtException;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
@@ -25,30 +28,48 @@ public class JwtAuthFilter extends OncePerRequestFilter {
     private final CustomUserDetailsService customUserDetailsService;
 
     @Override
-    protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
-        String authHeader = request.getHeader("Authorization");
+    protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain)
+            throws ServletException, IOException {
 
+        String authHeader = request.getHeader("Authorization");
         String token = null;
         String username = null;
-        if (authHeader != null && authHeader.startsWith("Bearer ")) {
-            token = authHeader.substring(7);
 
-            username = jwtUtil.extractUsername(token);
-        }
-
-        if (username != null && SecurityContextHolder.getContext().getAuthentication() == null) {
-            UserDetails userDetails = customUserDetailsService.loadUserByUsername(username);
-
-            if (jwtUtil.validateToken(username, userDetails, token)) {
-                UsernamePasswordAuthenticationToken authToken =
-                        new UsernamePasswordAuthenticationToken(userDetails, null, userDetails.getAuthorities());
-
-                authToken.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
-
-                SecurityContextHolder.getContext().setAuthentication(authToken);
+        try {
+            if (authHeader != null && authHeader.startsWith("Bearer ")) {
+                token = authHeader.substring(7);
+                username = jwtUtil.extractUsername(token); // May throw ExpiredJwtException
             }
-        }
 
-        filterChain.doFilter(request, response);
+            if (username != null && SecurityContextHolder.getContext().getAuthentication() == null) {
+                UserDetails userDetails = customUserDetailsService.loadUserByUsername(username);
+
+                if (jwtUtil.validateToken(username, userDetails, token)) {
+                    UsernamePasswordAuthenticationToken authToken =
+                            new UsernamePasswordAuthenticationToken(userDetails, null, userDetails.getAuthorities());
+
+                    authToken.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
+
+                    SecurityContextHolder.getContext().setAuthentication(authToken);
+                }
+            }
+
+            filterChain.doFilter(request, response);
+        } catch (ExpiredJwtException e) {
+            sendErrorResponse(response, "JWT token is expired");
+        } catch (Exception e) {
+            sendErrorResponse(response, "{\"error\": \"Invalid or malformed JWT token\"}");
+        }
     }
+
+    private void sendErrorResponse(HttpServletResponse response, String message) throws IOException {
+        GenericResponse<String> errorResponse = new GenericResponse<>(false, message, null);
+        response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+        response.setContentType("application/json");
+
+        ObjectMapper mapper = new ObjectMapper();
+        response.getWriter().write(mapper.writeValueAsString(errorResponse));
+    }
+
+
 }

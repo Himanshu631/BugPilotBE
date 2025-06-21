@@ -1,32 +1,31 @@
-package com.techio.bugpilot.project.payload;
+package com.techio.bugpilot.module.payload;
 
 import lombok.Builder;
 import lombok.Data;
 
-import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Map;
 
 @Data
 @Builder
-public class ProjectResponse {
+public class ModuleResponse {
     private String id;
     private String name;
     private String description;
-    private String clientId;
-    private String projectManagerId;
-    private LocalDate startDate;
-    private LocalDate endDate;
+
+    private String projectId;
+    private String ownerId;
     private List<String> tags;
-    private String workflowId;
-    private Map<String, Object> customFields;
-    private String slaConfigId;
     private String status;
+    private String priority;
+    private Integer order;
+    private Integer estimatedEffort;
+
+    private Map<String, Object> customFields;
+
     private String createdBy;
-    private String updatedBy;
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
 }
-
 
