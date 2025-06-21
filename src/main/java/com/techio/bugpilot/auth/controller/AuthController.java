@@ -2,15 +2,10 @@ package com.techio.bugpilot.auth.controller;
 
 import com.techio.bugpilot.auth.payload.AuthRequest;
 import com.techio.bugpilot.auth.service.AuthService;
-import com.techio.bugpilot.utility.GeneralUtility;
 import com.techio.bugpilot.utility.GenericResponse;
-import com.techio.bugpilot.utility.JwtUtil;
 import lombok.RequiredArgsConstructor;
-import org.apache.coyote.Response;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.authentication.AuthenticationManager;
-import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;

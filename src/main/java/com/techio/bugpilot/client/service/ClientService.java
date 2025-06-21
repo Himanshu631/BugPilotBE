@@ -10,45 +10,61 @@ import com.techio.bugpilot.user.service.UserService;
 import com.techio.bugpilot.utility.AuthContextUtil;
 import com.techio.bugpilot.utility.GeneralUtility;
 import com.techio.bugpilot.utility.GenericResponse;
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
+import java.util.UUID;
 
 @Service
+@RequiredArgsConstructor
 public class ClientService {
 
-    @Autowired
-    private ClientRepository clientRepository;
-
-    @Autowired
-    private AuthContextUtil authContextUtil;
-
-    @Autowired
-    private UserService userService;
+    private final ClientRepository clientRepository;
+    private final AuthContextUtil authContextUtil;
+    private final UserService userService;
 
     public GenericResponse<ClientResponse> createClient(ClientRequest request) {
+        Client client = Client.builder()
+                .id(UUID.randomUUID().toString())
+                .email(request.getEmail())
+                .organization(request.getOrganization())
+                .phoneNumber(request.getPhoneNumber())
+                .website(request.getWebsite())
+                .address(request.getAddress())
+                .industry(request.getIndustry())
+                .size(request.getSize())
+                .timezone(request.getTimezone())
+                .locale(request.getLocale())
+                .metadata(request.getMetadata())
+                .createdBy(authContextUtil.getUserId())
+                .updatedBy(authContextUtil.getUserId())
+                .createdAt(LocalDateTime.now())
+                .updatedAt(LocalDateTime.now())
+                .build();
 
-        Client client = new Client();
-        client.setEmail(request.getEmail());
-        client.setOrganization(request.getOrganization());
-
+        // Create admin user and associate
         UserRequest userRequest = request.getUserRequest();
         userRequest.setClientId(client.getId());
         userRequest.setIsFromClientAdmin(true);
         GenericResponse<User> serviceUser = userService.createUser(userRequest);
+
         if (!serviceUser.isSuccess()) {
             return GeneralUtility.failure("Admin user could not be created");
         }
 
-        clientRepository.save(client);
-        return GeneralUtility.success("Client created successfully", convertEntityToResponseDto(client));
+        client.setAdminUserId(serviceUser.getData().getId());
+
+        Client savedClient = clientRepository.save(client);
+        return GeneralUtility.success("Client created successfully", convertEntityToResponseDto(savedClient));
     }
 
     public GenericResponse<ClientResponse> getClientDetails(String clientId) {
-        Optional<Client> clientOptional = clientRepository.findById(clientId);
-        return clientOptional.map(client -> GeneralUtility.success("Client found", convertEntityToResponseDto(client))).orElseGet(() -> GeneralUtility.failure("Client not found"));
+        return clientRepository.findById(clientId)
+                .map(client -> GeneralUtility.success("Client found", convertEntityToResponseDto(client)))
+                .orElseGet(() -> GeneralUtility.failure("Client not found"));
     }
 
     public GenericResponse<List<ClientResponse>> getAllClients() {
@@ -65,7 +81,6 @@ public class ClientService {
         return GeneralUtility.success("Client list fetched successfully", responseList);
     }
 
-
     public GenericResponse<ClientResponse> updateClient(ClientRequest request) {
         String clientId = authContextUtil.getClientIdOrThrow();
         Optional<Client> optionalClient = clientRepository.findById(clientId);
@@ -74,20 +89,38 @@ public class ClientService {
         Client client = optionalClient.get();
         client.setEmail(request.getEmail());
         client.setOrganization(request.getOrganization());
+        client.setPhoneNumber(request.getPhoneNumber());
+        client.setWebsite(request.getWebsite());
+        client.setAddress(request.getAddress());
+        client.setIndustry(request.getIndustry());
+        client.setSize(request.getSize());
+        client.setTimezone(request.getTimezone());
+        client.setLocale(request.getLocale());
+        client.setMetadata(request.getMetadata());
+        client.setUpdatedAt(LocalDateTime.now());
 
-        clientRepository.save(client);
-        
-        ClientResponse clientResponse = convertEntityToResponseDto(client);
-        return GeneralUtility.success("Client updated", clientResponse);
+        Client updatedClient = clientRepository.save(client);
+        return GeneralUtility.success("Client updated", convertEntityToResponseDto(updatedClient));
     }
 
     private ClientResponse convertEntityToResponseDto(Client client) {
-        ClientResponse response = new ClientResponse();
-        response.setId(client.getId());
-        response.setEmail(client.getEmail());
-        response.setOrganization(client.getOrganization());
-        return response;
+        return ClientResponse.builder()
+                .id(client.getId())
+                .email(client.getEmail())
+                .organization(client.getOrganization())
+                .phoneNumber(client.getPhoneNumber())
+                .website(client.getWebsite())
+                .address(client.getAddress())
+                .industry(client.getIndustry())
+                .size(client.getSize())
+                .timezone(client.getTimezone())
+                .locale(client.getLocale())
+                .adminUserId(client.getAdminUserId())
+                .metadata(client.getMetadata())
+                .createdBy(client.getCreatedBy())
+                .updatedBy(client.getUpdatedBy())
+                .createdAt(client.getCreatedAt())
+                .updatedAt(client.getUpdatedAt())
+                .build();
     }
-
 }
-
