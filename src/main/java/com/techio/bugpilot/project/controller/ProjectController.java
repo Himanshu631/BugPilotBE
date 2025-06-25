@@ -21,12 +21,12 @@ public class ProjectController {
 
     @PostMapping
     public ResponseEntity<GenericResponse<ProjectResponse>> createProject(@RequestBody CreateProjectRequest request) {
-        return ResponseEntity.ok(projectService.createProject(request, authContextUtil.getClientIdOrThrow(), authContextUtil.getUserId()));
+        return ResponseEntity.ok(projectService.createProject(request, authContextUtil.getClientId(), authContextUtil.getUserId()));
     }
 
     @GetMapping
     public ResponseEntity<GenericResponse<List<ProjectResponse>>> getProjects() {
-        return ResponseEntity.ok(projectService.getProjectsByClient(authContextUtil.getClientIdOrThrow()));
+        return ResponseEntity.ok(projectService.getProjectsByClient(authContextUtil.getClientId()));
     }
 
     @PutMapping("/{id}")

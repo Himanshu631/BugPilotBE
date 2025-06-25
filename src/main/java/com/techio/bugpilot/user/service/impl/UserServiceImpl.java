@@ -1,10 +1,8 @@
 package com.techio.bugpilot.user.service.impl;
 
 import com.techio.bugpilot.config.AppConfig;
-import com.techio.bugpilot.rbac.entity.Role;
 import com.techio.bugpilot.rbac.repository.RoleRepository;
 import com.techio.bugpilot.user.entity.User;
-import com.techio.bugpilot.user.payload.UserPrincipal;
 import com.techio.bugpilot.user.payload.UserRequest;
 import com.techio.bugpilot.user.repository.UserDetailsRepository;
 import com.techio.bugpilot.user.service.UserService;
@@ -45,7 +43,7 @@ public class UserServiceImpl implements UserService {
         user.setUsername(userRequest.getUsername());
         user.setPassword(appConfig.passwordEncoder().encode(userRequest.getPassword()));
         if (userRequest.getClientId() == null || userRequest.getClientId().isEmpty()) {
-            user.setClientId(authContextUtil.getClientIdOrThrow());
+            user.setClientId(authContextUtil.getClientId());
         } else {
             user.setClientId(userRequest.getClientId());
         }
@@ -78,7 +76,7 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public GenericResponse<?> getAllUsersByClientId() {
-        String clientId = authContextUtil.getClientIdOrThrow();
+        String clientId = authContextUtil.getClientId();
         if (clientId == null || clientId.isEmpty()) {
             return GeneralUtility.failure("Client Id not found");
         }

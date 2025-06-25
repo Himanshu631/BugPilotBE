@@ -34,7 +34,7 @@ public class RoleServiceImpl implements RoleService {
 
         Role role = new Role();
         role.setName(request.getName());
-        role.setClientId(authContextUtil.getClientIdOrThrow());
+        role.setClientId(authContextUtil.getClientId());
         role.setDescription(request.getDescription());
         role.setPermissionIds(request.getPermissionIds());
 
@@ -64,7 +64,7 @@ public class RoleServiceImpl implements RoleService {
     }
 
     public GenericResponse<List<Role>> getUserRoles(String userId) {
-        String clientId = authContextUtil.getClientIdOrThrow();
+        String clientId = authContextUtil.getClientId();
 
         User user = userRepository.findByIdAndClientId(userId, clientId)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "User not found"));
@@ -74,7 +74,7 @@ public class RoleServiceImpl implements RoleService {
     }
 
     public GenericResponse<String> assignRoleToUser(String userId, String roleId) {
-        String clientId = authContextUtil.getClientIdOrThrow();
+        String clientId = authContextUtil.getClientId();
 
         Role role = roleRepository.findByIdAndClientId(roleId, clientId)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.BAD_REQUEST, "Role not found or not allowed"));
