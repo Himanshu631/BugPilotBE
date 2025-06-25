@@ -10,7 +10,7 @@ import org.springframework.web.server.ResponseStatusException;
 @Component
 public class AuthContextUtil {
 
-    public String getClientIdOrThrow() {
+    public String getClientId() {
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
 
         if (auth == null || auth.getPrincipal() == null) {

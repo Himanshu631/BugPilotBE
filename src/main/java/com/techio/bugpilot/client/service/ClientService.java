@@ -82,7 +82,7 @@ public class ClientService {
     }
 
     public GenericResponse<ClientResponse> updateClient(ClientRequest request) {
-        String clientId = authContextUtil.getClientIdOrThrow();
+        String clientId = authContextUtil.getClientId();
         Optional<Client> optionalClient = clientRepository.findById(clientId);
         if (optionalClient.isEmpty()) return GeneralUtility.failure("Client not found");
 
